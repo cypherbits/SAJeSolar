@@ -1126,6 +1126,8 @@ class SAJeSolarMeterSensor(SensorEntity):
                                     self._state = "Exporting"
                                 elif energy["storeDevicePower"]["gridDirection"] == -1:
                                     self._state = "Importing"
+                                elif energy["storeDevicePower"]["gridDirection"] == 0:
+                                    self._state = "StandBy"
                                 else:
                                     self._state = energy["storeDevicePower"]["gridDirection"]
                                     _LOGGER.error(f"Grid Direction unknown value: {self._state}")
@@ -1162,7 +1164,7 @@ class SAJeSolarMeterSensor(SensorEntity):
                                 elif energy["storeDevicePower"]["pvDirection"] == -1:
                                     self._state = "Importing"
                                 elif energy["storeDevicePower"]["pvDirection"] == 0:
-                                    self._state = "Stand By"
+                                    self._state = "StandBy"
                                 else:
                                     self._state = energy["storeDevicePower"]["pvDirection"]
                                     _LOGGER.error(f"pv Direction unknown value: {self._state}")
