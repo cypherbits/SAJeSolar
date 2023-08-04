@@ -717,7 +717,7 @@ class SAJeSolarMeterData(object):
                     result_batteryTemperature["batteryTemperature"] = result_findBatteryRealTimeList["list"][0][0]["batTemperature"]
                     plantDetails.update(result_batteryTemperature)
                 except (KeyError, IndexError, TypeError):
-                    _LOGGER.error("batTemperature is null or array structure is null")
+                    _LOGGER.warning("batTemperature is null or array structure is null")
 
                 if response_findBatteryRealTimeList.status != 200:
                     _LOGGER.error(f"{response_findBatteryRealTimeList.url} returned {response_findBatteryRealTimeList.status}")
@@ -877,7 +877,7 @@ class SAJeSolarMeterData(object):
 
         # Clear session and cookies
         self._session.cookie_jar.clear()
-        self._session.close()
+        #await self._session.close()
 
     @property
     def latest_data(self):
@@ -925,7 +925,7 @@ class SAJeSolarMeterSensor(SensorEntity):
             if self._type == 'devOnlineNum':
                 if 'devOnlineNum' in energy['plantDetail']:
                     if energy['plantDetail']["devOnlineNum"] is not None:
-                        if int(energy['plantDetail']["devOnlineNum"]) is 0:
+                        if int(energy['plantDetail']["devOnlineNum"]) == 0:
                             self._state = "No"
                         else:
                             self._state = "Yes"
@@ -936,7 +936,7 @@ class SAJeSolarMeterSensor(SensorEntity):
             if self._type == 'runningState':
                 if 'runningState' in energy['plantDetail']:
                     if energy['plantDetail']["runningState"] is not None:
-                        if int(energy['plantDetail']["runningState"]) is 0:
+                        if int(energy['plantDetail']["runningState"]) == 0:
                             self._state = "No"
                         else:
                             self._state = "Yes"
@@ -1140,7 +1140,7 @@ class SAJeSolarMeterSensor(SensorEntity):
                     if self._type == 'h1Online':
                         if 'isOnline' in energy["storeDevicePower"]:
                             if energy["storeDevicePower"]['isOnline'] is not None:
-                                if int(energy['storeDevicePower']["isOnline"]) is 0:
+                                if int(energy['storeDevicePower']["isOnline"]) == 0:
                                     self._state = "No"
                                 else:
                                     self._state = "Yes"
