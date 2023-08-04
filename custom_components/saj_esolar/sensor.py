@@ -708,14 +708,16 @@ class SAJeSolarMeterData(object):
                 url_findBatteryRealTimeList = f"https://fop.saj-electric.com/saj/cloudMonitor/deviceInfo/findBatteryRealTimeList"
                 #"2022-11-10+21:30:00"
                 datetime_now = datetime.datetime.now().strftime("%Y-%m-%d+%H:%M:%S")
-                _LOGGER.debug(datetime_now)
                 payloadBattery= f"devicesn={deviceSnArr}&timeStr={datetime_now}"
                 response_findBatteryRealTimeList = await self._session.post(url_findBatteryRealTimeList, headers=headers, data=payloadBattery)
                 result_findBatteryRealTimeList = await response_findBatteryRealTimeList.json()
+                _LOGGER.debug(f"findBatteryRealTimeList: {result_findBatteryRealTimeList}")
                 result_batteryTemperature = dict()
-                result_batteryTemperature["batteryTemperature"]=result_findBatteryRealTimeList["list"][0][0]["batTemperature"]
-                plantDetails.update(result_batteryTemperature)
-                _LOGGER.debug(result_findBatteryRealTimeList)
+                try:
+                    result_batteryTemperature["batteryTemperature"] = result_findBatteryRealTimeList["list"][0][0]["batTemperature"]
+                    plantDetails.update(result_batteryTemperature)
+                except (KeyError, IndexError, TypeError):
+                    _LOGGER.error("batTemperature is null or array structure is null")
 
                 if response_findBatteryRealTimeList.status != 200:
                     _LOGGER.error(f"{response_findBatteryRealTimeList.url} returned {response_findBatteryRealTimeList.status}")
@@ -1153,6 +1155,8 @@ class SAJeSolarMeterSensor(SensorEntity):
                                     self._state = "Exporting"
                                 elif energy["storeDevicePower"]["outPutDirection"] == -1:
                                     self._state = "Importing"
+                                elif energy["storeDevicePower"]["outPutDirection"] == 0:
+                                    self._state = "StandBy"
                                 else:
                                     self._state = energy["storeDevicePower"]["outPutDirection"]
                                     _LOGGER.error(f"outPut Direction unknown value: {self._state}")
